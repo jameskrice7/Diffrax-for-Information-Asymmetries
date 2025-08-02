@@ -1,3 +1,4 @@
+
 """Training utilities for Finax models.
 
 This module exposes two utilities:
@@ -8,8 +9,6 @@ This module exposes two utilities:
     A generator yielding rolling-window train/test splits, useful for
     time-series cross validation.
 """
-
-from __future__ import annotations
 
 from collections.abc import Iterable
 from typing import Any, Callable, Generator, List, Optional, Tuple
