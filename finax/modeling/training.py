@@ -1,83 +1,75 @@
+
 """Training utilities for Finax models.
 
 This module exposes two utilities:
 
 ``train``
-    A minimal training loop with optional early-stopping and learning rate
-    scheduling hooks. Users provide a ``step_fn`` which performs one update and
-    returns a metric (typically the loss) for the current iteration::
-
-        >>> data = [1, 2, 3]
-        >>> def step_fn(batch, lr, step):
-        ...     return batch * lr
-        >>> train(step_fn, data, steps=3, lr_schedule=lambda s: 0.1)
-
+    A minimal gradient-based training loop using Optax optimisers.
 ``rolling_cv``
     A generator yielding rolling-window train/test splits, useful for
-    time-series cross validation::
-
-        >>> data = list(range(10))
-        >>> for train_split, test_split in rolling_cv(lambda x: x, data, 4, 2):
-        ...     pass
-
-Both utilities are intentionally lightweight to accommodate a variety of model
-types and optimisation strategies.
+    time-series cross validation.
 """
 
-from __future__ import annotations
-
 from collections.abc import Iterable
-from typing import Any, Callable, Generator, Tuple
+from typing import Any, Callable, Generator, List, Optional, Tuple
+
+import jax
+import optax
 
 
 def train(
-    step_fn: Callable[[Any, float, int], float],
+    params: Any,
+    loss_fn: Callable[[Any, Any], jax.Array],
     data: Iterable[Any],
     *,
+    optimizer: optax.GradientTransformation | None = None,
     steps: int = 100,
-    early_stopping: Callable[[int, float], bool] | None = None,
-    lr_schedule: Callable[[int], float] | None = None,
-) -> Tuple[int, float]:
-    """Run a simple training loop.
+    record_history: bool = False,
+) -> Tuple[Any, Optional[List[float]]]:
+    """Run a simple Optax-based training loop.
 
     Parameters
     ----------
-    step_fn:
-        Callable taking ``(batch, learning_rate, step)`` and returning a metric
-        (e.g. loss) for the step.
+    params:
+        Initial model parameters.
+    loss_fn:
+        Callable ``(params, batch) -> loss`` returning a scalar.
     data:
-        Iterable of batches supplied to ``step_fn``.
+        Iterable yielding batches used for optimisation.
+    optimizer:
+        Optax optimiser. Defaults to :func:`optax.adam(1e-3)`.
     steps:
-        Maximum number of optimisation steps.
-    early_stopping:
-        Optional callable ``(step, metric) -> bool``. If it returns ``True`` the
-        loop terminates early.
-    lr_schedule:
-        Optional callable ``step -> learning_rate`` used to adjust the learning
-        rate per iteration.
+        Number of optimisation steps.
+    record_history:
+        If ``True``, return list of losses for each step.
 
     Returns
     -------
-    Tuple[int, float]
-        The last completed step index and its associated metric.
+    Tuple[Any, Optional[List[float]]]
+        Updated parameters and optional loss history.
     """
+    if optimizer is None:
+        optimizer = optax.adam(1e-3)
 
+    opt_state = optimizer.init(params)
+    history: List[float] | None = [] if record_history else None
     iterator = iter(data)
-    metric = float("nan")
-    for step in range(steps):
+
+    for _ in range(steps):
         try:
             batch = next(iterator)
         except StopIteration:  # pragma: no cover - defensive
             iterator = iter(data)
             batch = next(iterator)
 
-        lr = lr_schedule(step) if lr_schedule is not None else 1.0
-        metric = step_fn(batch, lr, step)
+        loss, grads = jax.value_and_grad(loss_fn)(params, batch)
+        updates, opt_state = optimizer.update(grads, opt_state, params)
+        params = optax.apply_updates(params, updates)
 
-        if early_stopping is not None and early_stopping(step, metric):
-            break
+        if history is not None:
+            history.append(float(loss))
 
-    return step, metric
+    return params, history
 
 
 def rolling_cv(
