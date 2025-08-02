@@ -22,3 +22,4 @@ eikon = ["eikon"]
 flax = ["flax"]
 haiku = ["dm-haiku"]
 visualization = ["matplotlib", "seaborn"]
+

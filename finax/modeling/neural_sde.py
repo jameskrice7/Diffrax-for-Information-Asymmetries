@@ -45,3 +45,4 @@ class NeuralSDE:
         from ..visualization import plot_solution
 
         return plot_solution(solution, **kwargs)
+

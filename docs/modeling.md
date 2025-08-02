@@ -25,6 +25,8 @@ jax_fn = keras_to_jax(keras_model)
 - `finax.modeling.training.train` is a placeholder for future optimization loops.
 - `finax.modeling.simulation.simulate_paths` will offer Monte Carlo path generation utilities.
 
+
 ## Visualization
 Solutions returned by `NeuralODE.solve` and `NeuralSDE.simulate` can be visualized via
 `finax.visualization.plot_solution` or the models' `plot` methods.
+
