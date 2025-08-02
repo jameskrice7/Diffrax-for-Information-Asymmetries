@@ -12,6 +12,7 @@ Finax wraps Diffrax solvers to build neural ordinary and stochastic differential
 ## Neural CDE
 - `finax.modeling.neural_cde.NeuralCDE` handles controlled differential equations where the derivative depends on an external control signal.
 
+
 ## Framework Adapters
 Finax lets you author models in popular neural-network libraries and call them from JAX/Diffrax code:
 
@@ -34,6 +35,8 @@ jax_fn = keras_to_jax(keras_model)
 - `finax.modeling.finance.vasicek_rate` constructs a Vasicek interest rate model.
 - `finax.modeling.finance.logistic_growth` provides a logistic growth ODE for macroeconomic output.
 
+
 ## Visualization
 Solutions returned by `NeuralODE.solve` and `NeuralSDE.simulate` can be visualized via
 `finax.visualization.plot_solution` or the models' `plot` methods.
+
