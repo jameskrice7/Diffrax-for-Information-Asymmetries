@@ -1,11 +1,18 @@
+import importlib.util
 import pathlib
-import sys
 
+import jax.numpy as jnp
+import optax
 import pytest
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
+# Load module directly to avoid importing optional dependencies
+module_path = pathlib.Path(__file__).resolve().parents[1] / "finax" / "modeling" / "training.py"
+spec = importlib.util.spec_from_file_location("training", module_path)
+training = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(training)
 
-from finax.modeling.training import rolling_cv, train
+rolling_cv = training.rolling_cv
+train = training.train
 
 
 def test_rolling_cv_boundaries():
@@ -20,27 +27,20 @@ def test_rolling_cv_boundaries():
     ]
 
 
-def test_early_stopping():
-    data = [None] * 10
+def test_train_updates_params():
+    params = jnp.array(1.0)
 
-    metrics = []
+    def loss_fn(p, _):
+        return jnp.square(p)
 
-    def step_fn(batch, lr, step):
-        metric = 1.0 / (step + 1)
-        metrics.append(metric)
-        return metric
-
-    def early_stop(step, metric):
-        return metric < 0.3
-
-    last_step, last_metric = train(
-        step_fn,
-        data,
-        steps=10,
-        early_stopping=early_stop,
-        lr_schedule=lambda s: 1.0,
+    trained_params, history = train(
+        params,
+        loss_fn,
+        [None],
+        steps=20,
+        optimizer=optax.sgd(0.1),
+        record_history=True,
     )
 
-    assert last_step == 3
-    assert pytest.approx(last_metric) == 0.25
-    assert len(metrics) == 4
+    assert history[0] > history[-1]
+    assert abs(float(trained_params)) < 0.05
