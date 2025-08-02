@@ -42,3 +42,4 @@ jax_fn = keras_to_jax(keras_model)
 ## Visualization
 Solutions returned by `NeuralODE.solve` and `NeuralSDE.simulate` can be visualized via
 `finax.visualization.plot_solution` or the models' `plot` methods.
+

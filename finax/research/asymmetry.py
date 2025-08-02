@@ -76,3 +76,4 @@ def pin_from_daily_prices(data: pd.DataFrame) -> float:
     total = buy_volume + sell_volume
     imbalance = (buy_volume - sell_volume).abs()
     return (imbalance / total).mean()
+

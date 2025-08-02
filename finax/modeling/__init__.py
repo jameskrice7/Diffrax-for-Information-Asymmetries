@@ -21,6 +21,7 @@ __all__ = [
     "NeuralCDE",
     "NeuralJumpSDE",
     "train",
+    "rolling_cv",
     "simulate_paths",
     "keras_to_jax",
     "torch_module_to_jax",

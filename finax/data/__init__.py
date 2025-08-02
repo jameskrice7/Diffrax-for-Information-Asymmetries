@@ -1,3 +1,4 @@
+
 """Data utilities for Finax."""
 
 from .ingestion import (
@@ -32,4 +33,9 @@ __all__ = [
     "daily_ohlcv",
     "monthly_ohlcv",
     "compute_bid_ask_spread",
+    "rsi",
+    "macd",
+    "bollinger_bands",
+    "rolling_volatility",
+    "event_flags",
 ]

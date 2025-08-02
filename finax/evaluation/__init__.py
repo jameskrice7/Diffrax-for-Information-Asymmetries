@@ -7,7 +7,6 @@ from .time_series import (
     fit_arma,
     fit_arima,
     fit_garch,
-    residual_diagnostics,
 )
 from .tests import (
     adf_test,
@@ -15,6 +14,7 @@ from .tests import (
     ljung_box,
     jarque_bera_test,
     ks_test,
+
 )
 
 __all__ = [

@@ -34,11 +34,13 @@ class NeuralODE:
             raise ImportError("JAX and Diffrax are required for solving ODEs.")
         return diffrax.diffeqsolve(self.vector_field, t0=t0, t1=t1, y0=y0, **kwargs)
 
+
     def plot(self, solution: Any, **kwargs: Any) -> Any:
         """Visualize an ODE solution using Finax's plotting helpers."""
         from ..visualization import plot_solution
 
         return plot_solution(solution, **kwargs)
+
 
     def validate(self, observed: Any, simulated: Any, lags: int = 20):
         """Run statistical tests on residuals between observed and simulated data.
@@ -67,3 +69,4 @@ class NeuralODE:
             "ljung_box": ljung_box(residuals, lags=lags),
             "ks": ks_test(residuals),
         }
+
