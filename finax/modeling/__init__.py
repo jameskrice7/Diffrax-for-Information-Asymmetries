@@ -15,7 +15,6 @@ from .hf_integration import hf_model_to_jax
 from .flax_finance import FinancialRNN, LogReturn
 from .stochastic import brownian_motion, poisson_process
 
-
 __all__ = [
     "NeuralODE",
     "NeuralSDE",

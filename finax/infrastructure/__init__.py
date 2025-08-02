@@ -1,7 +1,6 @@
 """Infrastructure utilities for Finax."""
 
 from .config import load_config
-
 from .devices import available_devices, default_device, to_device
 
 __all__ = [

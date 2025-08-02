@@ -10,7 +10,6 @@ def rolling_mean(series: pd.Series, window: int) -> pd.Series:
     return series.rolling(window).mean()
 
 
-
 def technical_indicator(series: pd.Series) -> pd.Series:
     """Placeholder for a technical indicator such as RSI."""
     raise NotImplementedError("Indicator not implemented.")

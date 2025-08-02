@@ -46,3 +46,31 @@ class NeuralSDE:
 
         return plot_solution(solution, **kwargs)
 
+    def validate(self, observed: Any, simulated: Any, lags: int = 20):
+        """Run statistical tests on residuals between observed and simulated paths.
+
+        Parameters
+        ----------
+        observed, simulated:
+            Arrays or sequences for the actual data and model output.
+        lags:
+            Number of lags for the Ljung-Box autocorrelation test.
+        """
+        import numpy as np
+        from ..evaluation import (
+            adf_test,
+            kpss_test,
+            ljung_box,
+            jarque_bera_test,
+            ks_test,
+        )
+
+        residuals = np.asarray(observed) - np.asarray(simulated)
+        return {
+            "adf": adf_test(residuals),
+            "kpss": kpss_test(residuals),
+            "jarque_bera": jarque_bera_test(residuals),
+            "ljung_box": ljung_box(residuals, lags=lags),
+            "ks": ks_test(residuals),
+        }
+

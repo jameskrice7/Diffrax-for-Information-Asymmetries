@@ -25,6 +25,5 @@ visualization = ["matplotlib", "seaborn"]
 excel = ["openpyxl"]
 hdf5 = ["tables"]
 huggingface = ["datasets", "transformers"]
-timeseries = ["statsmodels", "arch"]
-
+timeseries = ["statsmodels", "arch", "scipy"]
 

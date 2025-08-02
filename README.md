@@ -9,7 +9,6 @@ Finax is a Python library built on JAX and Diffrax for financial data processing
 - Import remote data via URLs or Hugging Face datasets; fetch market data through connectors such as Refinitiv Eikon
 - Aggregate intraday quotes into daily or monthly OHLCV bars and compute bid-ask spreads
 
-
 ### Modeling
 - Build neural ODE, SDE, CDE, and jump-diffusion models on top of Diffrax
 - Predefined constructs for geometric Brownian motion, Vasicek interest rates, and logistic growth
@@ -22,7 +21,8 @@ Finax is a Python library built on JAX and Diffrax for financial data processing
 
 ### Evaluation
 - Fit AR, MA, ARMA, ARIMA, or GARCH models to simulated time series for post-hoc analysis
-- 
+- Run statistical diagnostics such as ADF, KPSS, Jarque–Bera, Ljung–Box, and KS tests on residuals
+
 ### Infrastructure
 - Device helpers automatically select CPU, GPU, or TPU and move arrays to accelerators
 - Configuration loading for reproducible experiments

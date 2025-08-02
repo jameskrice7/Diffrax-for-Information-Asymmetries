@@ -57,7 +57,6 @@ def information_asymmetry_index(spread: pd.Series, volume: pd.Series) -> float:
     return (spread / volume).mean()
 
 
-
 def pin_from_daily_prices(data: pd.DataFrame) -> float:
     """Estimate PIN using daily OHLCV data.
 
@@ -77,5 +76,4 @@ def pin_from_daily_prices(data: pd.DataFrame) -> float:
     total = buy_volume + sell_volume
     imbalance = (buy_volume - sell_volume).abs()
     return (imbalance / total).mean()
-=======
 
