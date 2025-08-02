@@ -14,4 +14,5 @@ __all__ = [
     "evaluation",
     "infrastructure",
     "utils",
+    "research",
 ]

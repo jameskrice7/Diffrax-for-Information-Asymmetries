@@ -9,7 +9,6 @@ def rolling_mean(series: pd.Series, window: int) -> pd.Series:
     """Compute a rolling mean over ``window`` observations."""
     return series.rolling(window).mean()
 
-
 def rsi(series: pd.Series, window: int = 14) -> pd.Series:
     """Compute the Relative Strength Index (RSI).
 

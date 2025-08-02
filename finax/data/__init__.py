@@ -1,3 +1,4 @@
+
 """Data utilities for Finax.
 
 This submodule collects helpers for loading, cleaning and engineering
@@ -36,6 +37,7 @@ __all__ = [
     "fill_missing",
     "detect_outliers",
     "rolling_mean",
+    "technical_indicator",
     "rsi",
     "macd",
     "bollinger_bands",
