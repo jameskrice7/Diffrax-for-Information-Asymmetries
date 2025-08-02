@@ -1,0 +1,24 @@
+[project]
+name = "finax"
+version = "0.1.0"
+description = "Financial modeling on JAX and Diffrax"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "jax",
+    "diffrax",
+    "pandas",
+    "numpy",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+tensorflow = ["tensorflow"]
+torch = ["torch"]
+eikon = ["eikon"]
+flax = ["flax"]
+haiku = ["dm-haiku"]
+visualization = ["matplotlib", "seaborn"]
