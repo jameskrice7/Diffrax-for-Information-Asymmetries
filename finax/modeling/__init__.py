@@ -1,9 +1,16 @@
-"""Modeling utilities for Finax."""
+"""Modeling utilities for Finax.
+
+The modeling subpackage exposes neural differential equation wrappers and
+training helpers. Optional integrations with frameworks such as Flax or PyTorch
+are intentionally not imported here to keep dependency requirements minimal at
+import time.
+"""
 
 from .neural_ode import NeuralODE
 from .neural_sde import NeuralSDE
 from .neural_cde import NeuralCDE
 from .neural_jump_sde import NeuralJumpSDE
+from .training import train, rolling_cv
 from .finance import geometric_brownian_motion, vasicek_rate, logistic_growth
 from .training import train
 from .simulation import simulate_paths
@@ -19,6 +26,7 @@ except Exception:  # pragma: no cover - graceful fallback
     FinancialRNN = LogReturn = None
 from .stochastic import brownian_motion, poisson_process
 
+
 __all__ = [
     "NeuralODE",
     "NeuralSDE",
@@ -26,17 +34,4 @@ __all__ = [
     "NeuralJumpSDE",
     "train",
     "rolling_cv",
-    "simulate_paths",
-    "keras_to_jax",
-    "torch_module_to_jax",
-    "flax_module_to_jax",
-    "haiku_module_to_jax",
-    "hf_model_to_jax",
-    "FinancialRNN",
-    "LogReturn",
-    "geometric_brownian_motion",
-    "vasicek_rate",
-    "logistic_growth",
-    "brownian_motion",
-    "poisson_process",
 ]
