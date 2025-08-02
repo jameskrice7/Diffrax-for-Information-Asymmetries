@@ -9,6 +9,7 @@ from .torch_integration import torch_module_to_jax
 from .flax_integration import flax_module_to_jax
 from .haiku_integration import haiku_module_to_jax
 
+
 __all__ = [
     "NeuralODE",
     "NeuralSDE",
