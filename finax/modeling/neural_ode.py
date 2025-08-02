@@ -34,8 +34,10 @@ class NeuralODE:
             raise ImportError("JAX and Diffrax are required for solving ODEs.")
         return diffrax.diffeqsolve(self.vector_field, t0=t0, t1=t1, y0=y0, **kwargs)
 
+
     def plot(self, solution: Any, **kwargs: Any) -> Any:
         """Visualize an ODE solution using Finax's plotting helpers."""
         from ..visualization import plot_solution
 
         return plot_solution(solution, **kwargs)
+
