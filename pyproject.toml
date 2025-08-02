@@ -26,4 +26,7 @@ excel = ["openpyxl"]
 hdf5 = ["tables"]
 huggingface = ["datasets", "transformers"]
 timeseries = ["statsmodels", "arch", "scipy"]
+yahoo = ["requests"]
+quandl = ["requests"]
+streaming = ["websocket-client", "kafka-python"]
 
