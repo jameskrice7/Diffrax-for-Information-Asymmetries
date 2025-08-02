@@ -1,9 +1,13 @@
 # Finax
 
-Finax is a Python library built on top of JAX and Diffrax for financial data
+
+Finax is a Python library built on JAX and Diffrax for financial data
 processing and modeling with neural ordinary and stochastic differential
-equations. This repository currently contains the initial skeleton of the
-package.
+ equations. It targets researchers studying information asymmetry and
+provides adapters for popular deep learning frameworks alongside GPU/TPU
+execution, making it suitable for use in Google Colab or other
+accelerated environments.
+
 
 ## Package Structure
 
