@@ -74,7 +74,6 @@ def fit_garch(series: pd.Series, p: int = 1, q: int = 1):
     model = arch_model(series, vol="GARCH", p=p, q=q)
     return model.fit(disp="off")
 
-
 def residual_diagnostics(residuals: pd.Series, lags: int = 20):
     """Run common statistical tests on model residuals.
 
@@ -94,3 +93,4 @@ def residual_diagnostics(residuals: pd.Series, lags: int = 20):
         "ljung_box": ljung_box(res, lags=lags),
         "ks": ks_test(res),
     }
+

@@ -8,6 +8,9 @@ Finax provides utilities for ingesting, cleaning, and engineering features from 
 - `finax.data.ingestion.load_hdf5` loads HDF5 stores, while `load_sqlite` issues SQL queries against SQLite databases.
 - `finax.data.ingestion.load_remote_csv` reads CSV files directly from URLs for quick experimentation.
 - `finax.data.ingestion.load_hf_dataset` fetches datasets from the Hugging Face Hub and converts them to DataFrames.
+- `finax.data.ingestion.fetch_yahoo` downloads historical quotes from Yahoo Finance via its REST API.
+- `finax.data.ingestion.fetch_quandl` retrieves datasets from Quandl using an API key.
+- `finax.data.ingestion.stream_quotes` streams real-time quotes from WebSocket or Kafka feeds.
 - `finax.data.eikon.fetch_eikon` retrieves time-series data from Refinitiv Eikon when the `eikon` package is installed.
 
 ```python
@@ -20,6 +23,13 @@ quotes = fetch_eikon(
     api_key="YOUR_APP_KEY",
 )
 ```
+
+### API keys and dependencies
+
+- Yahoo Finance endpoints used here do not require an API key.
+- Quandl requests need a `QUANDL_API_KEY` provided via argument or environment variable.
+- HTTP helpers rely on the `requests` package.
+- Streaming utilities depend on `websocket-client` for WebSocket connections and `kafka-python` for Kafka consumers. Install them via optional extras: `finax[yahoo]`, `finax[quandl]`, or `finax[streaming]`.
 
 ## Cleaning
 - `finax.data.cleaning.fill_missing` forward-fills missing values.

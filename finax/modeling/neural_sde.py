@@ -19,11 +19,23 @@ class NeuralSDE:
         self.drift = drift
         self.diffusion = diffusion
 
-    def simulate(self, y0: Any, t0: float, t1: float, *, key: Any, **kwargs: Any) -> Any:
+    def simulate(
+        self,
+        y0: Any,
+        t0: float,
+        t1: float,
+        *,
+        key: Any,
+        solver: Any | None = None,
+        dt0: float = 0.1,
+        **kwargs: Any,
+    ) -> Any:
+
         """Simulate the SDE path.
 
         Parameters
         ----------
+
         y0: initial state
         t0, t1: time interval
         key: random key for stochastic integration
@@ -37,6 +49,39 @@ class NeuralSDE:
             y0=y0,
             args=(self.diffusion,),
             key=key,
+
+        y0:
+            Initial state.
+        t0, t1:
+            Time interval for simulation.
+        key:
+            PRNG key used to generate the Brownian motion driving the SDE.
+        solver:
+            Optional Diffrax solver. Defaults to ``diffrax.EulerHeun``.
+        dt0:
+            Initial step size for the solver.
+        """
+
+        if diffrax is None:
+            raise ImportError("JAX and Diffrax are required for simulation.")
+
+        if solver is None:  # pragma: no cover - default solver
+            solver = diffrax.EulerHeun()
+
+        brownian = diffrax.VirtualBrownianTree(
+            t0=t0, t1=t1, tol=1e-3, shape=jnp.shape(y0), key=key
+        )
+        term = diffrax.MultiTerm(
+            diffrax.ODETerm(self.drift),
+            diffrax.ControlTerm(self.diffusion, brownian),
+        )
+        return diffrax.diffeqsolve(
+            term,
+            solver=solver,
+            t0=t0,
+            t1=t1,
+            dt0=dt0,
+            y0=y0,
             **kwargs,
         )
 
@@ -73,3 +118,4 @@ class NeuralSDE:
             "ljung_box": ljung_box(residuals, lags=lags),
             "ks": ks_test(residuals),
         }
+
