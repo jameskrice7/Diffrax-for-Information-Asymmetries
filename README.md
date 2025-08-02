@@ -7,18 +7,22 @@ Finax is a Python library built on JAX and Diffrax for financial data processing
 ### Data Handling
 - Load CSV, Parquet, JSON, Excel, HDF5, and SQLite datasets using pandas
 - Import remote data via URLs or Hugging Face datasets; fetch market data through connectors such as Refinitiv Eikon
-- Clean and engineer features; fetch market data through connectors such as Refinitiv Eikon
+- Aggregate intraday quotes into daily or monthly OHLCV bars and compute bid-ask spreads
 
 
 ### Modeling
 - Build neural ODE, SDE, CDE, and jump-diffusion models on top of Diffrax
 - Predefined constructs for geometric Brownian motion, Vasicek interest rates, and logistic growth
+- Simulate standalone Brownian motion and Poisson processes
 - Integrate networks authored in TensorFlow, PyTorch, Flax, Haiku, or Hugging Face Transformers
 - Flax modules tailored to financial time-series modeling
 
 ### Research Utilities
-- Compute publication-grade metrics including probability of informed trading (PIN) and volume‑synchronized PIN (VPIN)
+- Compute publication-grade metrics including probability of informed trading (PIN), volume‑synchronized PIN (VPIN), and PIN derived from daily prices
 
+### Evaluation
+- Fit AR, MA, ARMA, ARIMA, or GARCH models to simulated time series for post-hoc analysis
+- 
 ### Infrastructure
 - Device helpers automatically select CPU, GPU, or TPU and move arrays to accelerators
 - Configuration loading for reproducible experiments
@@ -55,6 +59,7 @@ Additional guides are available in the `docs/` directory:
 
 - `docs/data.md` – ingestion, cleaning, and feature engineering
 - `docs/modeling.md` – neural ODE/SDE wrappers and framework adapters
+- `docs/evaluation.md` – metrics and classical time-series models
 - `docs/research.md` – information asymmetry metrics
 - `docs/infrastructure.md` – device management and configuration utilities
 - `docs/visualization.md` – plotting helpers for time series and model outputs

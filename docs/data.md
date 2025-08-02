@@ -28,3 +28,4 @@ quotes = fetch_eikon(
 ## Feature Engineering
 - `finax.data.features.rolling_mean` computes rolling averages.
 - Additional indicators such as RSI can be implemented via `finax.data.features.technical_indicator`.
+- `finax.data.ohlc.daily_ohlcv` and `monthly_ohlcv` aggregate intraday trades into OHLCV bars and compute bid-ask spreads when available.

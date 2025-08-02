@@ -10,6 +10,11 @@ def rolling_mean(series: pd.Series, window: int) -> pd.Series:
     return series.rolling(window).mean()
 
 
+
+def technical_indicator(series: pd.Series) -> pd.Series:
+    """Placeholder for a technical indicator such as RSI."""
+    raise NotImplementedError("Indicator not implemented.")
+
 def rsi(series: pd.Series, window: int = 14) -> pd.Series:
     """Compute the Relative Strength Index (RSI).
 
@@ -91,4 +96,5 @@ def event_flags(df: pd.DataFrame, events: pd.DataFrame) -> pd.DataFrame:
         )
 
     return flagged
+
 

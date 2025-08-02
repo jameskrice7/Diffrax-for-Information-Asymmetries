@@ -35,10 +35,11 @@ jax_fn = keras_to_jax(keras_model)
 - `finax.modeling.finance.geometric_brownian_motion` builds a geometric Brownian motion for asset prices.
 - `finax.modeling.finance.vasicek_rate` constructs a Vasicek interest rate model.
 - `finax.modeling.finance.logistic_growth` provides a logistic growth ODE for macroeconomic output.
+- `finax.modeling.stochastic.brownian_motion` and `poisson_process` generate basic stochastic processes.
 - `finax.modeling.flax_finance.FinancialRNN` offers an LSTM block tailored for financial time-series data.
-
 
 ## Visualization
 Solutions returned by `NeuralODE.solve` and `NeuralSDE.simulate` can be visualized via
 `finax.visualization.plot_solution` or the models' `plot` methods.
+- `finax.modeling.flax_finance.FinancialRNN` offers an LSTM block tailored for financial time-series data.
 

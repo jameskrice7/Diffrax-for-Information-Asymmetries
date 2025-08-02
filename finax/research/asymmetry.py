@@ -55,3 +55,27 @@ def information_asymmetry_index(spread: pd.Series, volume: pd.Series) -> float:
     """
 
     return (spread / volume).mean()
+
+
+
+def pin_from_daily_prices(data: pd.DataFrame) -> float:
+    """Estimate PIN using daily OHLCV data.
+
+    This heuristic classifies each day's volume as buyer- or seller-initiated
+    based on the sign of the daily return (close minus open) and computes the
+    average absolute imbalance.
+
+    Parameters
+    ----------
+    data:
+        DataFrame containing ``open``, ``close``, and ``volume`` columns.
+    """
+
+    price_change = data["close"] - data["open"]
+    buy_volume = data["volume"].where(price_change > 0, 0.0)
+    sell_volume = data["volume"].where(price_change <= 0, 0.0)
+    total = buy_volume + sell_volume
+    imbalance = (buy_volume - sell_volume).abs()
+    return (imbalance / total).mean()
+=======
+

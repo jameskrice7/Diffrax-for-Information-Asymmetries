@@ -5,7 +5,7 @@ from .neural_sde import NeuralSDE
 from .neural_cde import NeuralCDE
 from .neural_jump_sde import NeuralJumpSDE
 from .finance import geometric_brownian_motion, vasicek_rate, logistic_growth
-from .training import train, rolling_cv
+from .training import train
 from .simulation import simulate_paths
 from .tf_integration import keras_to_jax
 from .torch_integration import torch_module_to_jax
@@ -13,13 +13,14 @@ from .flax_integration import flax_module_to_jax
 from .haiku_integration import haiku_module_to_jax
 from .hf_integration import hf_model_to_jax
 from .flax_finance import FinancialRNN, LogReturn
+from .stochastic import brownian_motion, poisson_process
+
 
 __all__ = [
     "NeuralODE",
     "NeuralSDE",
     "NeuralCDE",
     "NeuralJumpSDE",
-    "train",
     "train",
     "rolling_cv",
     "simulate_paths",
@@ -33,4 +34,6 @@ __all__ = [
     "geometric_brownian_motion",
     "vasicek_rate",
     "logistic_growth",
+    "brownian_motion",
+    "poisson_process",
 ]
