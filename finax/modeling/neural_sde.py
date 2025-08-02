@@ -39,3 +39,10 @@ class NeuralSDE:
             key=key,
             **kwargs,
         )
+
+    def plot(self, solution: Any, **kwargs: Any) -> Any:
+        """Visualize an SDE solution using Finax's plotting helpers."""
+        from ..visualization import plot_solution
+
+        return plot_solution(solution, **kwargs)
+

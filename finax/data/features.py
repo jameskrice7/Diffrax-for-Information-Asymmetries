@@ -90,3 +90,4 @@ def event_flags(df: pd.DataFrame, events: pd.DataFrame) -> pd.DataFrame:
         )
 
     return flagged
+

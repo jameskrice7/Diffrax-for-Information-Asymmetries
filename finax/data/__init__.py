@@ -1,4 +1,5 @@
 
+
 """Data utilities for Finax.
 
 This submodule collects helpers for loading, cleaning and engineering
@@ -26,6 +27,7 @@ from .features import (
     rolling_volatility,
     event_flags,
 )
+
 from .eikon import fetch_eikon
 
 __all__ = [
