@@ -21,6 +21,7 @@ Finax lets you author models in popular neural-network libraries and call them f
 - `finax.modeling.haiku_integration.haiku_module_to_jax` wraps a Haiku apply function.
 - `finax.modeling.hf_integration.hf_model_to_jax` loads a Hugging Face Transformer model and presents it as a JAX callable.
 
+
 ```python
 from finax.modeling.tf_integration import keras_to_jax
 jax_fn = keras_to_jax(keras_model)
@@ -36,6 +37,8 @@ jax_fn = keras_to_jax(keras_model)
 - `finax.modeling.finance.logistic_growth` provides a logistic growth ODE for macroeconomic output.
 - `finax.modeling.flax_finance.FinancialRNN` offers an LSTM block tailored for financial time-series data.
 
+
 ## Visualization
 Solutions returned by `NeuralODE.solve` and `NeuralSDE.simulate` can be visualized via
 `finax.visualization.plot_solution` or the models' `plot` methods.
+

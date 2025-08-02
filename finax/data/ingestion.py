@@ -59,6 +59,7 @@ def load_sqlite(path: str, query: str) -> pd.DataFrame:
         return pd.read_sql_query(query, conn)
 
 
+
 def load_remote_csv(url: str, *, parse_dates: Optional[list[str]] = None) -> pd.DataFrame:
     """Load a remote CSV file directly into a DataFrame using pandas."""
 
@@ -82,3 +83,4 @@ def load_hf_dataset(name: str, *, split: str = "train", **kwargs) -> pd.DataFram
 
     ds = load_dataset(name, split=split, **kwargs)
     return ds.to_pandas()
+
