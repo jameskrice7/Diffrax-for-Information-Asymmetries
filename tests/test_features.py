@@ -1,19 +1,21 @@
+import importlib.util
 import sys
 from pathlib import Path
 
 import pandas as pd
 import pandas.testing as tm
 
-# Ensure package root is on the import path
-sys.path.append(str(Path(__file__).resolve().parents[1]))
+# Load the features module directly to avoid importing optional dependencies
+module_path = Path(__file__).resolve().parents[1] / "finax" / "data" / "features.py"
+spec = importlib.util.spec_from_file_location("features", module_path)
+features = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(features)
 
-from finax.data import (
-    rsi,
-    macd,
-    bollinger_bands,
-    rolling_volatility,
-    event_flags,
-)
+rsi = features.rsi
+macd = features.macd
+bollinger_bands = features.bollinger_bands
+rolling_volatility = features.rolling_volatility
+event_flags = features.event_flags
 
 
 def test_rsi_basic():
