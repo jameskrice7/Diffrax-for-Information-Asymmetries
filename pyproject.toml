@@ -22,4 +22,5 @@ eikon = ["eikon"]
 flax = ["flax"]
 haiku = ["dm-haiku"]
 visualization = ["matplotlib", "seaborn"]
-
+excel = ["openpyxl"]
+hdf5 = ["tables"]

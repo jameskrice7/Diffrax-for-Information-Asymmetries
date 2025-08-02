@@ -10,4 +10,3 @@ __all__ = [
     "default_device",
     "to_device",
 ]
-
