@@ -30,3 +30,4 @@ yahoo = ["requests"]
 quandl = ["requests"]
 streaming = ["websocket-client", "kafka-python"]
 
+

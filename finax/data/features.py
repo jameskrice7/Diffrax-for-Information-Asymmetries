@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pandas as pd
-import pandas as pd
 
 
 def rolling_mean(series: pd.Series, window: int) -> pd.Series:
@@ -14,6 +13,7 @@ def rolling_mean(series: pd.Series, window: int) -> pd.Series:
 def technical_indicator(series: pd.Series) -> pd.Series:
     """Placeholder for a technical indicator such as RSI."""
     raise NotImplementedError("Indicator not implemented.")
+
 
 def rsi(series: pd.Series, window: int = 14) -> pd.Series:
     """Compute the Relative Strength Index (RSI).

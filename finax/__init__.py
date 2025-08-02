@@ -1,3 +1,4 @@
+
 """Finax: Financial modeling tools built on JAX and Diffrax.
 
 This package provides utilities for loading and cleaning financial data, with
@@ -11,6 +12,7 @@ dependencies during ``finax`` import. Users can access them via ``finax.data``,
 ``finax.modeling`` and so on without incurring the import cost until needed.
 """
 
+
 __all__ = [
     "data",
     "modeling",
@@ -20,3 +22,16 @@ __all__ = [
     "research",
     "visualization",
 ]
+
+
+
+def __getattr__(name: str) -> ModuleType:  # pragma: no cover - thin wrapper
+    if name in __all__:
+        module = import_module(f"finax.{name}")
+        globals()[name] = module
+        return module
+    raise AttributeError(f"module 'finax' has no attribute '{name}'")
+
+
+if TYPE_CHECKING:  # pragma: no cover
+    from . import data, modeling, evaluation, infrastructure, utils, research, visualization

@@ -12,7 +12,6 @@ from .tests import (
     ks_test,
 )
 
-
 try:  # pragma: no cover - optional dependency
     from statsmodels.tsa.ar_model import AutoReg
     from statsmodels.tsa.arima.model import ARIMA
@@ -74,8 +73,6 @@ def fit_garch(series: pd.Series, p: int = 1, q: int = 1):
     _check_arch()
     model = arch_model(series, vol="GARCH", p=p, q=q)
     return model.fit(disp="off")
-
-
 
 def residual_diagnostics(residuals: pd.Series, lags: int = 20):
     """Run common statistical tests on model residuals.

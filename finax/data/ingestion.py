@@ -1,13 +1,11 @@
 """Data ingestion utilities for Finax."""
 
 from __future__ import annotations
-
-from typing import Any, Callable, Iterator, Optional
-
 import io
 import json
 import pandas as pd
 import requests
+
 
 
 def load_csv(path: str, *, parse_dates: Optional[list[str]] = None) -> pd.DataFrame:
@@ -85,7 +83,6 @@ def load_hf_dataset(name: str, *, split: str = "train", **kwargs) -> pd.DataFram
 
     ds = load_dataset(name, split=split, **kwargs)
     return ds.to_pandas()
-
 
 def fetch_yahoo(
     symbol: str,

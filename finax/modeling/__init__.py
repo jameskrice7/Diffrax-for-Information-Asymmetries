@@ -19,6 +19,8 @@ from .torch_integration import torch_module_to_jax
 from .flax_integration import flax_module_to_jax
 from .haiku_integration import haiku_module_to_jax
 from .hf_integration import hf_model_to_jax
+from .flax_finance import FinancialRNN, LogReturn
+from .stochastic import brownian_motion, poisson_process
 
 try:  # Optional dependency
     from .flax_finance import FinancialRNN, LogReturn
@@ -26,12 +28,24 @@ except Exception:  # pragma: no cover - graceful fallback
     FinancialRNN = LogReturn = None
 from .stochastic import brownian_motion, poisson_process
 
-
 __all__ = [
     "NeuralODE",
     "NeuralSDE",
     "NeuralCDE",
     "NeuralJumpSDE",
     "train",
+    "simulate_paths",
+    "keras_to_jax",
+    "torch_module_to_jax",
+    "flax_module_to_jax",
+    "haiku_module_to_jax",
+    "hf_model_to_jax",
+    "FinancialRNN",
+    "LogReturn",
+    "geometric_brownian_motion",
+    "vasicek_rate",
+    "logistic_growth",
+    "brownian_motion",
+    "poisson_process",
     "rolling_cv",
 ]
