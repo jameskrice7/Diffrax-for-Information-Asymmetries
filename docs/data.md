@@ -6,7 +6,8 @@ Finax provides utilities for ingesting, cleaning, and engineering features from 
 - `finax.data.ingestion.load_csv`, `load_parquet`, and `load_json` load common file formats into `pandas.DataFrame` objects.
 - `finax.data.ingestion.load_excel` reads workbooks in XLSX/XLS format.
 - `finax.data.ingestion.load_hdf5` loads HDF5 stores, while `load_sqlite` issues SQL queries against SQLite databases.
-- `finax.data.ingestion.fetch_yahoo` is a placeholder for a Yahoo Finance connector.
+- `finax.data.ingestion.load_remote_csv` reads CSV files directly from URLs for quick experimentation.
+- `finax.data.ingestion.load_hf_dataset` fetches datasets from the Hugging Face Hub and converts them to DataFrames.
 - `finax.data.eikon.fetch_eikon` retrieves time-series data from Refinitiv Eikon when the `eikon` package is installed.
 
 ```python

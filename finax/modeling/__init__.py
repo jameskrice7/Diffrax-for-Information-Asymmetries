@@ -11,6 +11,8 @@ from .tf_integration import keras_to_jax
 from .torch_integration import torch_module_to_jax
 from .flax_integration import flax_module_to_jax
 from .haiku_integration import haiku_module_to_jax
+from .hf_integration import hf_model_to_jax
+from .flax_finance import FinancialRNN, LogReturn
 
 __all__ = [
     "NeuralODE",
@@ -25,6 +27,9 @@ __all__ = [
     "torch_module_to_jax",
     "flax_module_to_jax",
     "haiku_module_to_jax",
+    "hf_model_to_jax",
+    "FinancialRNN",
+    "LogReturn",
     "geometric_brownian_motion",
     "vasicek_rate",
     "logistic_growth",

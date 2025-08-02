@@ -8,7 +8,16 @@ import pandas as pd
 
 
 def load_csv(path: str, *, parse_dates: Optional[list[str]] = None) -> pd.DataFrame:
-    """Load CSV financial data into a DataFrame."""
+    """Load CSV financial data into a DataFrame.
+
+    Parameters
+    ----------
+    path:
+        Local file path to a CSV file.
+    parse_dates:
+        Optional list of column names to parse as dates.
+    """
+
     return pd.read_csv(path, parse_dates=parse_dates)
 
 
@@ -50,6 +59,28 @@ def load_sqlite(path: str, query: str) -> pd.DataFrame:
         return pd.read_sql_query(query, conn)
 
 
-def fetch_yahoo(symbol: str) -> pd.DataFrame:
-    """Placeholder for Yahoo Finance API connector."""
-    raise NotImplementedError("API connector not implemented.")
+
+def load_remote_csv(url: str, *, parse_dates: Optional[list[str]] = None) -> pd.DataFrame:
+    """Load a remote CSV file directly into a DataFrame using pandas."""
+
+    return pd.read_csv(url, parse_dates=parse_dates)
+
+
+def load_hf_dataset(name: str, *, split: str = "train", **kwargs) -> pd.DataFrame:
+    """Load a dataset hosted on the Hugging Face Hub into a DataFrame.
+
+    Parameters
+    ----------
+    name:
+        Dataset identifier on the Hub.
+    split:
+        Which split to load (e.g. ``"train"`` or ``"test"``).
+    **kwargs:
+        Additional keyword arguments forwarded to ``datasets.load_dataset``.
+    """
+
+    from datasets import load_dataset  # type: ignore
+
+    ds = load_dataset(name, split=split, **kwargs)
+    return ds.to_pandas()
+

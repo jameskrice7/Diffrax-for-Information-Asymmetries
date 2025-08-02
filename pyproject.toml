@@ -24,3 +24,6 @@ haiku = ["dm-haiku"]
 visualization = ["matplotlib", "seaborn"]
 excel = ["openpyxl"]
 hdf5 = ["tables"]
+huggingface = ["datasets", "transformers"]
+
+

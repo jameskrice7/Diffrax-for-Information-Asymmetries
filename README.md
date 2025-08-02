@@ -5,13 +5,16 @@ Finax is a Python library built on JAX and Diffrax for financial data processing
 ## Features
 
 ### Data Handling
-- Load CSV, Parquet, JSON, Excel, HDF5, and SQLite datasets
+- Load CSV, Parquet, JSON, Excel, HDF5, and SQLite datasets using pandas
+- Import remote data via URLs or Hugging Face datasets; fetch market data through connectors such as Refinitiv Eikon
 - Clean and engineer features; fetch market data through connectors such as Refinitiv Eikon
+
 
 ### Modeling
 - Build neural ODE, SDE, CDE, and jump-diffusion models on top of Diffrax
 - Predefined constructs for geometric Brownian motion, Vasicek interest rates, and logistic growth
-- Integrate networks authored in TensorFlow, PyTorch, Flax, or Haiku
+- Integrate networks authored in TensorFlow, PyTorch, Flax, Haiku, or Hugging Face Transformers
+- Flax modules tailored to financial time-series modeling
 
 ### Research Utilities
 - Compute publication-grade metrics including probability of informed trading (PIN) and volume‑synchronized PIN (VPIN)
@@ -29,9 +32,7 @@ Finax depends on JAX, Diffrax, NumPy and Pandas. Optional extras enable framewor
 
 ```bash
 
-
-pip install finax[tensorflow,torch,eikon,flax,haiku,visualization]
-
+pip install finax[tensorflow,torch,eikon,flax,haiku,visualization,huggingface]
 
 ```
 
@@ -80,4 +81,5 @@ accelerated environments.
 
 The project will expand with additional connectors, models, and training
 routines as development progresses.
+
 
