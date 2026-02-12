@@ -18,6 +18,7 @@ def _coerce_keys(key: Any | None, n_paths: int) -> Iterable[Any | None]:
         if jr is None:
             return [None] * n_paths
         seed = int.from_bytes(os.urandom(8), "little") % (2**32)
+        # JAX PRNGKey expects a 32-bit seed; reduce entropy accordingly.
         key = jr.PRNGKey(seed)
     if jr is None:
         return [key] * n_paths

@@ -2,6 +2,8 @@ import pandas as pd
 import pathlib
 import sys
 
+import jax.random as jr
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
 from finax.app import SiteLaunchConfig, dashboard_payload, render_dashboard_html
@@ -87,8 +89,6 @@ def test_simulate_paths_runs():
         def simulate(self, *, key, scale=1.0):
             self.keys.append(key)
             return float(scale)
-
-    import jax.random as jr
 
     model = DummyModel()
     outputs = simulate_paths(model, n_paths=3, key=jr.PRNGKey(0), scale=2.0)
