@@ -18,7 +18,7 @@ def _coerce_keys(key: Any | None, n_paths: int) -> Iterable[Any | None]:
         if jr is None:
             return [None] * n_paths
         seed = secrets.randbits(32)
-        # JAX PRNGKey expects a 32-bit seed.
+        # randbits(32) yields values in [0, 2**32 - 1] for JAX PRNGKey seeds.
         key = jr.PRNGKey(seed)
     if jr is None:
         return [key] * n_paths

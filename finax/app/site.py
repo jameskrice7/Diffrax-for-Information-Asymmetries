@@ -59,11 +59,12 @@ def render_dashboard_html(
     columns: Iterable[str] = payload.get("column_types", {}).keys()
     rows: list[dict[str, Any]] = payload.get("preview", [])
 
-    header = "".join(f"<th>{html.escape(str(col))}</th>" for col in columns)
-    body = ""
+    table_header = "".join(f"<th>{html.escape(str(col))}</th>" for col in columns)
+    body_rows = []
     for row in rows:
         cells = "".join(f"<td>{html.escape(str(row.get(col, '')))}</td>" for col in columns)
-        body += f"<tr>{cells}</tr>"
+        body_rows.append(f"<tr>{cells}</tr>")
+    body = "".join(body_rows)
 
     summary_items = ""
     for col, stats in payload.get("summary", {}).items():
@@ -88,6 +89,6 @@ def render_dashboard_html(
         "<h2>Summary</h2>"
         f"{summary_html}"
         "<h2>Preview</h2>"
-        f"<table><thead><tr>{header}</tr></thead><tbody>{body}</tbody></table>"
+        f"<table><thead><tr>{table_header}</tr></thead><tbody>{body}</tbody></table>"
         "</body></html>"
     )
