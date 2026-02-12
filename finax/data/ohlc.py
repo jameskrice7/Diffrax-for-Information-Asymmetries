@@ -15,7 +15,7 @@ def _resample_ohlcv(df: pd.DataFrame, freq: str) -> pd.DataFrame:
         ``volume`` columns. Optionally, ``bid`` and ``ask`` columns will be
         used to compute bid-ask spreads.
     freq:
-        Resample frequency such as ``'D'`` for daily or ``'M'`` for monthly.
+        Resample frequency such as ``'D'`` for daily or ``'ME'`` for month-end.
     """
 
     agg = {
@@ -45,7 +45,7 @@ def daily_ohlcv(df: pd.DataFrame) -> pd.DataFrame:
 def monthly_ohlcv(df: pd.DataFrame) -> pd.DataFrame:
     """Aggregate intraday data to monthly OHLCV records."""
 
-    return _resample_ohlcv(df, "M")
+    return _resample_ohlcv(df, "ME")
 
 
 def compute_bid_ask_spread(df: pd.DataFrame) -> pd.Series:

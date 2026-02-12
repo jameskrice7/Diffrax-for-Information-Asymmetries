@@ -39,7 +39,7 @@ def test_load_json(tmp_path):
     loaded = load_json(path)
     # pandas read_json sorts by column; ensure same order
     loaded = loaded[df.columns]
-    loaded["date"] = pd.to_datetime(loaded["date"])
+    loaded["date"] = pd.to_datetime(loaded["date"]).astype("datetime64[us]")
     loaded["price"] = loaded["price"].astype(float)
     pd.testing.assert_frame_equal(loaded, df)
 
@@ -81,5 +81,5 @@ def test_load_sqlite(tmp_path):
     query = "SELECT * FROM prices"
     loaded = load_sqlite(path, query)
     # read_sql returns columns as text; cast date
-    loaded["date"] = pd.to_datetime(loaded["date"])
+    loaded["date"] = pd.to_datetime(loaded["date"]).astype("datetime64[us]")
     assert loaded.equals(df)
