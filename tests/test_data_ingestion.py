@@ -41,6 +41,8 @@ def test_load_json(tmp_path):
     loaded = loaded[df.columns]
     loaded["date"] = pd.to_datetime(loaded["date"]).astype("datetime64[us]")
     loaded["price"] = loaded["price"].astype(float)
+    df = df.copy()
+    df["date"] = df["date"].astype("datetime64[us]")
     pd.testing.assert_frame_equal(loaded, df)
 
 
@@ -82,4 +84,6 @@ def test_load_sqlite(tmp_path):
     loaded = load_sqlite(path, query)
     # read_sql returns columns as text; cast date
     loaded["date"] = pd.to_datetime(loaded["date"]).astype("datetime64[us]")
+    df = df.copy()
+    df["date"] = df["date"].astype("datetime64[us]")
     assert loaded.equals(df)
