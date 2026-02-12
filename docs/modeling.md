@@ -19,6 +19,9 @@ Finax provides Diffrax/JAX-first differential equation tooling for financial tim
 - `simulate_regime_switching_process` for two-state volatility switching paths.
 - `inject_discontinuities` for synthetic stress testing via abrupt shocks.
 
+## Monte Carlo helpers
+- `simulate_paths` repeatedly calls model `simulate`/`solve` routines to assemble Monte Carlo path ensembles.
+
 ## Sandbox exploration
 - `ProcessSandbox` offers reproducible scenario runners in pure Python.
 - `SandboxScenario` standardizes simulation horizon and naming for scripted experiments.

@@ -29,6 +29,21 @@ from finax.visualization import plot_training_history
 plot_training_history(losses)
 ```
 
+## Web-ready summaries
+
+```python
+from finax.visualization import summarize_statistics, web_series_payload
+summary = summarize_statistics(df)
+payload = web_series_payload(df, max_points=500)
+```
+
+Use `figure_to_base64` to embed Matplotlib figures in web apps:
+
+```python
+from finax.visualization import figure_to_base64
+encoded = figure_to_base64(fig)
+```
+
 Install the visualization extras with:
 
 ```bash
