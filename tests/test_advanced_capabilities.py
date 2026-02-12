@@ -76,6 +76,7 @@ def test_web_series_payload_and_stats_helpers():
     stats = summarize_statistics(df)
 
     assert payload["series"]["x"] == [1, 2]
+    assert 3 not in payload["series"]["x"]
     assert "y" in stats
 
 
