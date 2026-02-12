@@ -8,7 +8,7 @@ import inspect
 
 try:  # pragma: no cover - optional at import time
     import jax.random as jr
-except Exception:  # pragma: no cover
+except ImportError:  # pragma: no cover
     jr = None  # type: ignore
 
 

@@ -62,7 +62,13 @@ def render_dashboard_html(payload: dict[str, Any], *, title: str = "Finax Dashbo
 
     summary_items = ""
     for col, stats in payload.get("summary", {}).items():
-        stat_text = ", ".join(f"{k}: {v:.3f}" for k, v in stats.items())
+        formatted_stats = []
+        for key, value in stats.items():
+            if isinstance(value, (int, float)):
+                formatted_stats.append(f"{key}: {value:.3f}")
+            else:
+                formatted_stats.append(f"{key}: {value}")
+        stat_text = ", ".join(formatted_stats)
         summary_items += f"<li><strong>{html.escape(col)}</strong> — {html.escape(stat_text)}</li>"
 
     summary_html = f"<ul>{summary_items}</ul>" if summary_items else "<p>No summary available.</p>"

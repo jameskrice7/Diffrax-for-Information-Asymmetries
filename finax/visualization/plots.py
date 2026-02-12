@@ -139,10 +139,10 @@ def web_series_payload(
     return {"index": index, "series": series}
 
 
-def figure_to_base64(fig: Any, *, format: str = "png") -> str:
+def figure_to_base64(fig: Any, *, img_format: str = "png") -> str:
     """Encode a Matplotlib figure to base64 for web delivery."""
     buffer = io.BytesIO()
-    fig.savefig(buffer, format=format, bbox_inches="tight")
+    fig.savefig(buffer, format=img_format, bbox_inches="tight")
     encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
     buffer.close()
     return encoded
