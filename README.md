@@ -16,6 +16,13 @@ Finax is a Python library built on JAX and Diffrax for financial data processing
 - Integrate networks authored in TensorFlow, PyTorch, Flax, Haiku, or Hugging Face Transformers
 - Flax modules tailored to financial time-series modeling
 
+
+### Advanced nSDE and Process Exploration
+- Build high-capacity neural SDE models with configurable deep MLP blocks (10k+ parameters)
+- Simulate jump-diffusion and regime-switching processes with discontinuities for stress testing
+- Use a Python-native sandbox to compare process families and summarize behavior under scenarios
+- Define app blueprints (`finax.app`) for future analytics products
+
 ### Research Utilities
 - Compute publication-grade metrics including probability of informed trading (PIN), volume‑synchronized PIN (VPIN), and PIN derived from daily prices
 

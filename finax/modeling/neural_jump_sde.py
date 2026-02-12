@@ -2,48 +2,56 @@
 
 from __future__ import annotations
 
-from typing import Callable, Any
+from typing import Any, Callable
 
-try:  # pragma: no cover - handled at runtime
-    import jax.numpy as jnp  # noqa: F401
-    import diffrax  # noqa: F401
-except Exception:  # pragma: no cover - optional at import
+try:  # pragma: no cover
+    import jax
+    import jax.numpy as jnp
+    import diffrax
+except Exception:  # pragma: no cover
+    jax = None  # type: ignore
     jnp = None  # type: ignore
     diffrax = None  # type: ignore
 
 
 class NeuralJumpSDE:
-    """Neural SDE with an additional jump component.
+    """Neural SDE with an explicit jump perturbation channel."""
 
-    Parameters
-    ----------
-    drift:
-        Callable representing the drift term.
-    diffusion:
-        Callable representing the diffusion term.
-    jump:
-        Callable representing jump sizes given jump times.
-    """
-
-    def __init__(self, drift: Callable[[Any, Any, Any], Any], diffusion: Callable[[Any, Any, Any], Any], jump: Callable[[Any, Any], Any]):
+    def __init__(
+        self,
+        drift: Callable[[Any, Any, Any], Any],
+        diffusion: Callable[[Any, Any, Any], Any],
+        jump: Callable[[Any, Any, Any], Any],
+    ):
         self.drift = drift
         self.diffusion = diffusion
         self.jump = jump
 
-    def simulate(self, y0: Any, t0: float, t1: float, *, key: Any, **kwargs: Any) -> Any:
-        """Simulate the jump diffusion SDE path."""
-        if diffrax is None:
-            raise ImportError("JAX and Diffrax are required for simulation.")
+    def simulate(
+        self,
+        y0: Any,
+        t0: float,
+        t1: float,
+        *,
+        key: Any,
+        dt: float = 0.01,
+        jump_intensity: float = 0.2,
+    ) -> Any:
+        """Simulate with Euler-style updates supporting discontinuities."""
+        if jax is None or jnp is None:
+            raise ImportError("JAX is required for jump SDE simulation.")
 
-        term = diffrax.MultiTerm(
-            diffrax.ODETerm(self.drift),
-            diffrax.ControlTerm(self.diffusion, diffrax.WeinerProcess(key)),
-        )
-        # Jump term is included as an event handler; placeholder for future refinement
-        return diffrax.diffeqsolve(term, t0=t0, t1=t1, y0=y0, key=key, **kwargs)
+        n_steps = max(1, int((t1 - t0) / dt))
+        keys = jax.random.split(key, n_steps)
 
-    def plot(self, solution: Any, **kwargs: Any) -> Any:
-        """Visualize an SDE solution with jumps using Finax's plotting helpers."""
-        from ..visualization import plot_solution
+        def step(y, k):
+            kn, kj = jax.random.split(k)
+            t = 0.0
+            dw = jnp.sqrt(dt) * jax.random.normal(kn, shape=jnp.shape(y))
+            y_next = y + self.drift(t, y, None) * dt + self.diffusion(t, y, None) * dw
+            jump_mask = jax.random.bernoulli(kj, p=jnp.clip(jump_intensity * dt, 0.0, 1.0), shape=jnp.shape(y))
+            y_next = y_next + jump_mask * self.jump(t, y_next, None)
+            return y_next, y_next
 
-        return plot_solution(solution, **kwargs)
+        _, ys = jax.lax.scan(step, y0, keys)
+        return jnp.concatenate([jnp.asarray(y0)[None, ...], ys], axis=0)
