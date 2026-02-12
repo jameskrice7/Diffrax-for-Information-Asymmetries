@@ -49,7 +49,12 @@ def dashboard_payload(
     return payload
 
 
-def render_dashboard_html(payload: dict[str, Any], *, title: str = "Finax Dashboard") -> str:
+def render_dashboard_html(
+    payload: dict[str, Any],
+    *,
+    title: str = "Finax Dashboard",
+    precision: int = 3,
+) -> str:
     """Render a simple HTML dashboard preview for web launches."""
     columns: Iterable[str] = payload.get("column_types", {}).keys()
     rows: list[dict[str, Any]] = payload.get("preview", [])
@@ -65,7 +70,7 @@ def render_dashboard_html(payload: dict[str, Any], *, title: str = "Finax Dashbo
         formatted_stats = []
         for key, value in stats.items():
             if isinstance(value, float):
-                formatted_stats.append(f"{key}: {value:.3f}")
+                formatted_stats.append(f"{key}: {value:.{precision}f}")
             else:
                 formatted_stats.append(f"{key}: {value}")
         stat_text = ", ".join(formatted_stats)
