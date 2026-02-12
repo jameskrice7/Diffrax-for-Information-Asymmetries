@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, Iterable
 
 import inspect
-import os
+import secrets
 
 try:  # pragma: no cover - optional at import time
     import jax.random as jr
@@ -17,8 +17,8 @@ def _coerce_keys(key: Any | None, n_paths: int) -> Iterable[Any | None]:
     if key is None:
         if jr is None:
             return [None] * n_paths
-        seed = int.from_bytes(os.urandom(8), "little") % (2**32)
-        # Draw 64-bit entropy but constrain to JAX's required 32-bit seed space.
+        seed = secrets.randbits(32)
+        # JAX PRNGKey expects a 32-bit seed.
         key = jr.PRNGKey(seed)
     if jr is None:
         return [key] * n_paths

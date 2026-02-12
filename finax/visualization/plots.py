@@ -109,7 +109,10 @@ def summarize_statistics(data: Any) -> dict[str, dict[str, float]]:
         series = numeric[col].dropna()
         if series.empty:
             continue
-        std_value = float(series.std(ddof=0))
+        if len(series) < 2:
+            std_value = 0.0
+        else:
+            std_value = float(series.std(ddof=1))
         summary[col] = {
             "mean": float(series.mean()),
             "std": std_value,
