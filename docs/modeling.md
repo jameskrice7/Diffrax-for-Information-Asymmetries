@@ -2,7 +2,7 @@
 
 Finax wraps Diffrax solvers to build neural ordinary and stochastic differential equation models.
 
-## Neural ODE
+## Neural ODE with cool stuff
 - `finax.modeling.neural_ode.NeuralODE` solves systems governed by trainable vector fields via `diffrax.diffeqsolve`.
 
 ## Neural SDE
