@@ -79,16 +79,26 @@ def render_dashboard_html(
 
     summary_html = f"<ul>{summary_items}</ul>" if summary_items else "<p>No summary available.</p>"
 
-    return (
-        "<!doctype html>"
-        f"<html><head><meta charset='utf-8'><title>{html.escape(title)}</title>"
-        "<style>body{font-family:Arial,sans-serif;margin:2rem;}table{border-collapse:collapse;width:100%;}"
-        "th,td{border:1px solid #ddd;padding:0.5rem;}th{background:#f5f5f5;text-align:left;}</style>"
-        "</head><body>"
-        f"<h1>{html.escape(title)}</h1>"
-        "<h2>Summary</h2>"
-        f"{summary_html}"
-        "<h2>Preview</h2>"
-        f"<table><thead><tr>{table_header}</tr></thead><tbody>{body}</tbody></table>"
-        "</body></html>"
-    )
+    return f"""<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>{html.escape(title)}</title>
+    <style>
+      body {{font-family: Arial, sans-serif; margin: 2rem;}}
+      table {{border-collapse: collapse; width: 100%;}}
+      th, td {{border: 1px solid #ddd; padding: 0.5rem;}}
+      th {{background: #f5f5f5; text-align: left;}}
+    </style>
+  </head>
+  <body>
+    <h1>{html.escape(title)}</h1>
+    <h2>Summary</h2>
+    {summary_html}
+    <h2>Preview</h2>
+    <table>
+      <thead><tr>{table_header}</tr></thead>
+      <tbody>{body}</tbody>
+    </table>
+  </body>
+</html>"""
