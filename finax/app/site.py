@@ -64,7 +64,7 @@ def render_dashboard_html(payload: dict[str, Any], *, title: str = "Finax Dashbo
     for col, stats in payload.get("summary", {}).items():
         formatted_stats = []
         for key, value in stats.items():
-            if isinstance(value, (int, float)):
+            if isinstance(value, float):
                 formatted_stats.append(f"{key}: {value:.3f}")
             else:
                 formatted_stats.append(f"{key}: {value}")

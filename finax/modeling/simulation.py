@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any, Iterable
 
 import inspect
-import time
+import os
 
 try:  # pragma: no cover - optional at import time
     import jax.random as jr
@@ -17,7 +17,8 @@ def _coerce_keys(key: Any | None, n_paths: int) -> Iterable[Any | None]:
     if key is None:
         if jr is None:
             return [None] * n_paths
-        key = jr.PRNGKey(time.time_ns() % (2**32))
+        seed = int.from_bytes(os.urandom(8), "little") % (2**32)
+        key = jr.PRNGKey(seed)
     if jr is None:
         return [key] * n_paths
     return jr.split(key, n_paths)
