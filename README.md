@@ -8,6 +8,8 @@ Finax is a Python library built on JAX and Diffrax for financial data processing
 - Load CSV, Parquet, JSON, Excel, HDF5, and SQLite datasets using pandas
 - Import remote data via URLs or Hugging Face datasets; fetch market data through connectors such as Refinitiv Eikon
 - Aggregate intraday quotes into daily or monthly OHLCV bars and compute bid-ask spreads
+- Handle sparse and high-dimensional tabular data with dedicated import and selection helpers
+- Derive text-native features (keyword intensity + bag-of-words) for NLP-aware quantitative workflows
 
 ### Modeling
 - Build neural ODE, SDE, CDE, and jump-diffusion models on top of Diffrax
@@ -21,7 +23,9 @@ Finax is a Python library built on JAX and Diffrax for financial data processing
 - Build high-capacity neural SDE models with configurable deep MLP blocks (10k+ parameters)
 - Simulate jump-diffusion and regime-switching processes with discontinuities for stress testing
 - Use a Python-native sandbox to compare process families and summarize behavior under scenarios
+- Simulate sparse high-dimensional factor processes and summarize sparsity/correlation structure
 - Define app blueprints (`finax.app`) for future analytics products
+- Prepare web launch payloads/configuration for Streamlit/FastAPI style dashboards
 
 ### Research Utilities
 - Compute publication-grade metrics including probability of informed trading (PIN), volume‑synchronized PIN (VPIN), and PIN derived from daily prices
@@ -90,6 +94,7 @@ accelerated environments.
 - `finax/evaluation` – performance metrics.
 - `finax/infrastructure` – configuration helpers.
 - `finax/utils` – shared utilities such as logging.
+- `finax/nlp` – text feature extraction for technical natural language columns.
 
 The project will expand with additional connectors, models, and training
 routines as development progresses.

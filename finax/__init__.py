@@ -15,6 +15,7 @@ __all__ = [
     "research",
     "visualization",
     "app",
+    "nlp",
 ]
 
 
@@ -27,4 +28,4 @@ def __getattr__(name: str) -> ModuleType:  # pragma: no cover - thin wrapper
 
 
 if TYPE_CHECKING:  # pragma: no cover
-    from . import app, data, evaluation, infrastructure, modeling, research, utils, visualization
+    from . import app, data, evaluation, infrastructure, modeling, nlp, research, utils, visualization

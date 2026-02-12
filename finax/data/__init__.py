@@ -12,6 +12,8 @@ from .ingestion import (
     load_hf_dataset,
 )
 from .cleaning import fill_missing, detect_outliers
+from .advanced_import import load_sparse_csv, densify_sparse_frame, select_high_dimensional_block
+
 
 from .features import (
     rolling_mean,
@@ -35,6 +37,9 @@ __all__ = [
     "load_sqlite",
     "load_remote_csv",
     "load_hf_dataset",
+    "load_sparse_csv",
+    "densify_sparse_frame",
+    "select_high_dimensional_block",
     "fetch_eikon",
     "fill_missing",
     "detect_outliers",

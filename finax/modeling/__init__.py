@@ -1,6 +1,7 @@
 """Modeling utilities for Finax."""
 
 from .finance import geometric_brownian_motion, logistic_growth, vasicek_rate
+from .highdim_simulation import simulate_sparse_factor_process, summarize_sparse_structure
 from .financial_processes import (
     JumpDiffusionConfig,
     RegimeSwitchingConfig,
@@ -33,6 +34,8 @@ __all__ = [
     "geometric_brownian_motion",
     "vasicek_rate",
     "logistic_growth",
+    "simulate_sparse_factor_process",
+    "summarize_sparse_structure",
     "brownian_motion",
     "poisson_process",
     "JumpDiffusionConfig",

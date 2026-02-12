@@ -36,7 +36,7 @@ def test_rolling_mean():
 
 
 def intraday_df():
-    idx = pd.date_range("2020-01-01", periods=4, freq="H")
+    idx = pd.date_range("2020-01-01", periods=4, freq="h")
     return pd.DataFrame(
         {
             "open": [1, 2, 3, 4],
