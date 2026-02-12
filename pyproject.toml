@@ -9,6 +9,8 @@ dependencies = [
     "diffrax",
     "pandas",
     "numpy",
+    "optax",
+    "requests",
 ]
 
 [build-system]
@@ -29,5 +31,4 @@ timeseries = ["statsmodels", "arch", "scipy"]
 yahoo = ["requests"]
 quandl = ["requests"]
 streaming = ["websocket-client", "kafka-python"]
-
 

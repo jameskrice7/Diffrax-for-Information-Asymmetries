@@ -2,16 +2,19 @@ import pandas as pd
 import pathlib
 import sys
 
+import jax.random as jr
+
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
-from finax.app import SiteLaunchConfig, dashboard_payload
+from finax.app import SiteLaunchConfig, dashboard_payload, render_dashboard_html
 from finax.data import (
     densify_sparse_frame,
     load_sparse_csv,
     select_high_dimensional_block,
 )
-from finax.modeling import simulate_sparse_factor_process, summarize_sparse_structure
+from finax.modeling import simulate_paths, simulate_sparse_factor_process, summarize_sparse_structure
 from finax.nlp import keyword_intensity, text_feature_frame
+from finax.visualization import summarize_statistics, web_series_payload
 
 
 def test_sparse_import_roundtrip(tmp_path):
@@ -53,3 +56,41 @@ def test_website_prep_payload():
     assert payload["rows"] == 2
     assert payload["columns"] == 2
     assert len(payload["preview"]) == 2
+
+
+def test_web_payload_summary_and_html():
+    df = pd.DataFrame({"value": [1.0, 2.0, 3.0], "label": ["a", "b", "c"]})
+    payload = dashboard_payload(df)
+
+    assert "summary" in payload
+    assert "chart_data" in payload
+    assert "value" in payload["summary"]
+    assert payload["chart_data"]["series"]["value"] == [1.0, 2.0, 3.0]
+
+    html_output = render_dashboard_html(payload, title="Finax Preview")
+    assert "<html>" in html_output
+    assert "Finax Preview" in html_output
+
+
+def test_web_series_payload_and_stats_helpers():
+    df = pd.DataFrame({"x": [1, 2, 3], "y": [3, 1, 2]})
+    payload = web_series_payload(df, max_points=2)
+    stats = summarize_statistics(df)
+
+    assert payload["series"]["x"] == [1, 2]
+    assert "y" in stats
+
+
+def test_simulate_paths_calls_model_simulate():
+    class DummyModel:
+        def __init__(self):
+            self.keys = []
+
+        def simulate(self, *, key, scale=1.0):
+            self.keys.append(key)
+            return float(scale)
+
+    model = DummyModel()
+    outputs = simulate_paths(model, n_paths=3, key=jr.PRNGKey(0), scale=2.0)
+    assert outputs == [2.0, 2.0, 2.0]
+    assert len(model.keys) == 3

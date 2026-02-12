@@ -1,7 +1,7 @@
 """Application scaffolding primitives for future Finax products."""
 
 from .blueprint import AppBlueprint, DataSourceConfig, ModelServiceConfig
-from .site import SiteLaunchConfig, dashboard_payload
+from .site import SiteLaunchConfig, dashboard_payload, render_dashboard_html
 
 __all__ = [
     "AppBlueprint",
@@ -9,4 +9,5 @@ __all__ = [
     "ModelServiceConfig",
     "SiteLaunchConfig",
     "dashboard_payload",
+    "render_dashboard_html",
 ]
