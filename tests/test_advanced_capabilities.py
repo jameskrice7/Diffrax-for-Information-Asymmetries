@@ -81,7 +81,7 @@ def test_web_series_payload_and_stats_helpers():
     assert "y" in stats
 
 
-def test_simulate_paths_runs():
+def test_simulate_paths_calls_model_simulate():
     class DummyModel:
         def __init__(self):
             self.keys = []
