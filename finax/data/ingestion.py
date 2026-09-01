@@ -1,161 +1,145 @@
-"""Data ingestion utilities for Finax."""
+"""Loading tabular data from files, databases and remote sources.
+
+Thin wrappers over pandas that add consistent error messages and lazy optional
+imports. Nothing here is JAX-specific; use :func:`~finax.data.frames.to_arrays`
+to cross into JAX.
+"""
 
 from __future__ import annotations
+
 import io
 import json
-import pandas as pd
-import requests
+from collections.abc import Callable, Iterator
+from pathlib import Path
+from typing import Any
+
+from ..errors import DataValidationError, require
+
+__all__ = [
+    "load_csv",
+    "load_parquet",
+    "load_json",
+    "load_excel",
+    "load_hdf5",
+    "load_sqlite",
+    "load_remote_csv",
+    "load_hf_dataset",
+    "fetch_url_csv",
+    "stream_quotes",
+]
 
 
+def _pandas():
+    return require("pandas", purpose="tabular data loading")
 
-def load_csv(path: str, *, parse_dates: Optional[list[str]] = None) -> pd.DataFrame:
-    """Load CSV financial data into a DataFrame.
+
+def load_csv(
+    path: str | Path,
+    *,
+    parse_dates: list[str] | None = None,
+    index_col: str | None = None,
+    **kwargs: Any,
+):
+    """Load a CSV file into a DataFrame.
 
     Parameters
     ----------
     path:
-        Local file path to a CSV file.
+        Local file path.
     parse_dates:
-        Optional list of column names to parse as dates.
+        Columns to parse as datetimes.
+    index_col:
+        Column to use as the index.
+    **kwargs:
+        Forwarded to ``pandas.read_csv``.
     """
-
-    return pd.read_csv(path, parse_dates=parse_dates)
-
-
-def load_parquet(path: str) -> pd.DataFrame:
-    """Load Parquet financial data into a DataFrame."""
-    return pd.read_parquet(path)
+    pd = _pandas()
+    return pd.read_csv(path, parse_dates=parse_dates, index_col=index_col, **kwargs)
 
 
-def load_json(path: str) -> pd.DataFrame:
-    """Load JSON financial data into a DataFrame."""
-    return pd.read_json(path)
+def load_parquet(path: str | Path, **kwargs: Any):
+    """Load a Parquet file into a DataFrame."""
+    pd = _pandas()
+    require("pyarrow", purpose="reading Parquet")
+    return pd.read_parquet(path, **kwargs)
 
 
-def load_excel(path: str, *, sheet_name: str | int | None = 0) -> pd.DataFrame:
-    """Load Excel financial data into a DataFrame.
+def load_json(path: str | Path, **kwargs: Any):
+    """Load a JSON file into a DataFrame."""
+    pd = _pandas()
+    return pd.read_json(path, **kwargs)
 
-    Parameters
-    ----------
-    path:
-        Location of the Excel file.
-    sheet_name:
-        Sheet within the workbook to read. Defaults to the first sheet.
+
+def load_excel(path: str | Path, *, sheet_name: str | int | None = 0, **kwargs: Any):
+    """Load a sheet of an Excel workbook into a DataFrame."""
+    pd = _pandas()
+    require("openpyxl", purpose="reading Excel workbooks")
+    return pd.read_excel(path, sheet_name=sheet_name, **kwargs)
+
+
+def load_hdf5(path: str | Path, key: str = "data", **kwargs: Any):
+    """Load a dataset from an HDF5 store."""
+    pd = _pandas()
+    require("tables", purpose="reading HDF5")
+    return pd.read_hdf(path, key=key, **kwargs)
+
+
+def load_sqlite(path: str | Path, query: str, **kwargs: Any):
+    """Run a SQL query against a SQLite file and return the result.
+
+    Examples
+    --------
+    >>> import sqlite3, tempfile, os
+    >>> tmp = os.path.join(tempfile.mkdtemp(), "t.db")
+    >>> con = sqlite3.connect(tmp)
+    >>> _ = con.execute("CREATE TABLE p (d TEXT, close REAL)")
+    >>> _ = con.execute("INSERT INTO p VALUES ('2024-01-01', 10.5)")
+    >>> con.commit(); con.close()
+    >>> df = load_sqlite(tmp, "SELECT * FROM p")
+    >>> df["close"].tolist()
+    [10.5]
     """
-
-    return pd.read_excel(path, sheet_name=sheet_name)
-
-
-def load_hdf5(path: str, key: str = "data") -> pd.DataFrame:
-    """Load HDF5 financial data into a DataFrame."""
-
-    return pd.read_hdf(path, key=key)
-
-
-def load_sqlite(path: str, query: str) -> pd.DataFrame:
-    """Load data from a SQLite database using a SQL query."""
     import sqlite3
 
-    with sqlite3.connect(path) as conn:
-        return pd.read_sql_query(query, conn)
+    pd = _pandas()
+    # `with sqlite3.connect(...)` manages the *transaction*, not the
+    # connection -- it does not close it. Use closing() so the handle is
+    # actually released.
+    from contextlib import closing
+
+    with closing(sqlite3.connect(str(path))) as conn:
+        return pd.read_sql_query(query, conn, **kwargs)
 
 
-def load_remote_csv(url: str, *, parse_dates: Optional[list[str]] = None) -> pd.DataFrame:
-    """Load a remote CSV file directly into a DataFrame using pandas."""
+def load_remote_csv(url: str, *, parse_dates: list[str] | None = None, **kwargs: Any):
+    """Load a CSV directly from a URL."""
+    pd = _pandas()
+    return pd.read_csv(url, parse_dates=parse_dates, **kwargs)
 
-    return pd.read_csv(url, parse_dates=parse_dates)
 
-
-def load_hf_dataset(name: str, *, split: str = "train", **kwargs) -> pd.DataFrame:
-    """Load a dataset hosted on the Hugging Face Hub into a DataFrame.
-
-    Parameters
-    ----------
-    name:
-        Dataset identifier on the Hub.
-    split:
-        Which split to load (e.g. ``"train"`` or ``"test"``).
-    **kwargs:
-        Additional keyword arguments forwarded to ``datasets.load_dataset``.
-    """
-
-    from datasets import load_dataset  # type: ignore
-
-    ds = load_dataset(name, split=split, **kwargs)
-    return ds.to_pandas()
-
-def fetch_yahoo(
-    symbol: str,
+def fetch_url_csv(
+    url: str,
     *,
-    start: str | None = None,
-    end: str | None = None,
-    interval: str = "1d",
-) -> pd.DataFrame:
-    """Fetch historical data from Yahoo Finance.
+    params: dict[str, Any] | None = None,
+    headers: dict[str, str] | None = None,
+    timeout: float = 30.0,
+):
+    """Fetch a CSV over HTTP with explicit parameters, headers and timeout.
 
-    Parameters
-    ----------
-    symbol:
-        Ticker symbol to download, e.g. ``"AAPL"``.
-    start, end:
-        Optional date range in ``YYYY-MM-DD`` format.
-    interval:
-        Data frequency such as ``"1d"`` or ``"1h"``.
+    Use this rather than :func:`load_remote_csv` when the endpoint needs query
+    parameters or authentication headers.
     """
-
-    params: dict[str, Any] = {"interval": interval, "events": "history"}
-    if start:
-        params["period1"] = int(pd.Timestamp(start, tz="UTC").timestamp())
-    else:
-        params["period1"] = 0
-    if end:
-        params["period2"] = int(pd.Timestamp(end, tz="UTC").timestamp())
-    else:
-        params["period2"] = int(pd.Timestamp.utcnow().timestamp())
-
-    url = f"https://query1.finance.yahoo.com/v7/finance/download/{symbol}"
-    resp = requests.get(url, params=params)
-    resp.raise_for_status()
-    return pd.read_csv(io.StringIO(resp.text))
+    requests = require("requests", purpose="HTTP requests")
+    pd = _pandas()
+    response = requests.get(url, params=params, headers=headers, timeout=timeout)
+    response.raise_for_status()
+    return pd.read_csv(io.StringIO(response.text))
 
 
-def fetch_quandl(
-    dataset: str,
-    *,
-    start_date: str | None = None,
-    end_date: str | None = None,
-    api_key: str | None = None,
-) -> pd.DataFrame:
-    """Retrieve a dataset from Quandl.
-
-    Parameters
-    ----------
-    dataset:
-        Quandl dataset identifier such as ``"WIKI/AAPL"``.
-    start_date, end_date:
-        Optional date filters in ``YYYY-MM-DD`` format.
-    api_key:
-        Quandl API key. If ``None``, the ``QUANDL_API_KEY`` environment
-        variable is used when available.
-    """
-
-    params = {}
-    if start_date:
-        params["start_date"] = start_date
-    if end_date:
-        params["end_date"] = end_date
-    if api_key is None:
-        from os import getenv
-
-        api_key = getenv("QUANDL_API_KEY")
-    if api_key:
-        params["api_key"] = api_key
-
-    url = f"https://www.quandl.com/api/v3/datasets/{dataset}.json"
-    resp = requests.get(url, params=params)
-    resp.raise_for_status()
-    payload = resp.json()["dataset"]
-    return pd.DataFrame(payload["data"], columns=payload["column_names"])
+def load_hf_dataset(name: str, *, split: str = "train", **kwargs: Any):
+    """Load a Hugging Face Hub dataset into a DataFrame."""
+    datasets = require("datasets", purpose="loading Hugging Face datasets")
+    return datasets.load_dataset(name, split=split, **kwargs).to_pandas()
 
 
 def stream_quotes(
@@ -165,45 +149,41 @@ def stream_quotes(
     kafka_topic: str | None = None,
     parser: Callable[[str], Any] = json.loads,
 ) -> Iterator[Any]:
-    """Stream quote messages from WebSocket or Kafka sources.
+    """Yield parsed messages from a WebSocket or Kafka quote stream.
 
     Parameters
     ----------
     ws_url:
-        WebSocket endpoint providing quote data.
-    kafka_servers:
-        List of Kafka bootstrap servers.
-    kafka_topic:
-        Topic to subscribe to when using Kafka.
+        WebSocket endpoint.
+    kafka_servers, kafka_topic:
+        Kafka bootstrap servers and topic.
     parser:
-        Function used to parse each incoming message. Defaults to ``json.loads``.
+        Applied to each raw message. Defaults to ``json.loads``.
 
     Yields
     ------
-    Parsed messages from the stream.
+    Parsed messages, indefinitely. Wrap in ``itertools.islice`` to bound it.
     """
-
     if ws_url:
-        import websocket  # type: ignore
-
-        ws = websocket.create_connection(ws_url)
+        websocket = require("websocket", purpose="WebSocket streaming")
+        connection = websocket.create_connection(ws_url)
         try:
             while True:
-                msg = ws.recv()
-                yield parser(msg)
+                yield parser(connection.recv())
         finally:
-            ws.close()
+            connection.close()
     elif kafka_servers and kafka_topic:
-        from kafka import KafkaConsumer  # type: ignore
-
-        consumer = KafkaConsumer(kafka_topic, bootstrap_servers=kafka_servers)
-        for msg in consumer:
-            if isinstance(msg.value, bytes):
-                yield parser(msg.value.decode("utf-8"))
-            else:
-                yield parser(msg.value)
+        kafka = require("kafka", purpose="Kafka streaming")
+        consumer = kafka.KafkaConsumer(kafka_topic, bootstrap_servers=kafka_servers)
+        try:
+            for message in consumer:
+                value = message.value
+                if isinstance(value, bytes):
+                    value = value.decode("utf-8")
+                yield parser(value)
+        finally:
+            consumer.close()
     else:
-        raise ValueError(
-            "Provide either a WebSocket URL or Kafka connection parameters."
+        raise DataValidationError(
+            "stream_quotes needs either ws_url, or both kafka_servers and kafka_topic."
         )
-

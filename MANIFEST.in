@@ -1,0 +1,8 @@
+include LICENSE
+include NOTICE
+include README.md
+include CHANGELOG.md
+include finax/py.typed
+recursive-include docs *.md
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]

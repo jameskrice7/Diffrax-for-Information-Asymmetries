@@ -1,18 +1,131 @@
 name: Tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
+  lint:
+    name: Lint and type check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-      - name: Install dependencies
-        run: |
-          pip install -e .
-          pip install pytest
+          python-version: "3.12"
+          cache: pip
+      - run: pip install ruff mypy
+      - name: Ruff (lint)
+        run: ruff check finax tests
+      - name: Ruff (format)
+        run: ruff format --check finax tests
+      - name: Mypy
+        run: mypy finax
+        continue-on-error: true
+
+  test:
+    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        include:
+          # Confirm the package works off the Linux happy path too.
+          - os: macos-latest
+            python-version: "3.12"
+          - os: windows-latest
+            python-version: "3.12"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install
+        run: pip install -e ".[dev]"
       - name: Run tests
-        run: pytest
+        run: pytest tests -n auto --cov=finax --cov-report=xml
+      - name: Run doctests
+        run: pytest --doctest-modules finax -n auto
+      - name: Upload coverage
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+
+  minimal-install:
+    name: Core dependencies only
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      # The core must be usable without pandas, matplotlib or statsmodels, and
+      # a missing optional dependency must produce an actionable error rather
+      # than an AttributeError on None deep inside a call stack.
+      - name: Install without extras
+        run: pip install -e . pytest
+      - name: Core functionality works
+        run: |
+          python -c "
+          import jax.numpy as jnp
+          import finax
+          from finax.microstructure import estimate_pin
+          from finax.processes import GeometricBrownianMotion
+          import jax.random as jr
+
+          r = estimate_pin(jnp.full((50,), 100.0), jnp.full((50,), 90.0), steps=50)
+          assert 0.0 <= float(r.pin) <= 1.0
+
+          p = GeometricBrownianMotion(mu=0.05, sigma=0.2).sample(
+              jnp.array(100.0), ts=jnp.linspace(0, 1, 50), key=jr.PRNGKey(0),
+              n_paths=10)
+          assert p.shape == (10, 50)
+          print('core OK')
+          "
+      - name: Missing extras give actionable errors
+        run: |
+          python -c "
+          from finax.errors import MissingDependencyError
+          import finax.data
+          try:
+              finax.data.load_csv('x.csv')
+          except MissingDependencyError as e:
+              assert 'pip install' in str(e), e
+              print('error message OK:', e)
+          else:
+              raise SystemExit('expected MissingDependencyError')
+          "
+
+  build:
+    name: Build and verify distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build twine
+      - run: python -m build
+      - name: Validate metadata
+        run: twine check dist/*
+      - name: Install the wheel in a clean environment
+        run: |
+          python -m venv /tmp/clean
+          /tmp/clean/bin/pip install dist/*.whl
+          /tmp/clean/bin/python -c "import finax; print(finax.__version__)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: distribution
+          path: dist/
