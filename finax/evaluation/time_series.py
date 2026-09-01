@@ -1,96 +1,53 @@
-"""Classical time-series models for post-simulation analysis."""
+"""Classical time-series baselines.
+
+A neural SDE is worth using only if it beats ARIMA and GARCH. These wrappers
+make that comparison cheap to run, so it stops being skipped.
+"""
 
 from __future__ import annotations
 
-import pandas as pd
+from typing import Any
 
-from .tests import (
-    adf_test,
-    kpss_test,
-    ljung_box,
-    jarque_bera_test,
-    ks_test,
-)
+from ..errors import require
 
-try:  # pragma: no cover - optional dependency
-    from statsmodels.tsa.ar_model import AutoReg
-    from statsmodels.tsa.arima.model import ARIMA
-except Exception:  # pragma: no cover
-    AutoReg = None  # type: ignore
-    ARIMA = None  # type: ignore
-
-try:  # pragma: no cover - optional dependency
-    from arch import arch_model
-except Exception:  # pragma: no cover
-    arch_model = None  # type: ignore
+__all__ = ["fit_ar", "fit_ma", "fit_arima", "fit_garch"]
 
 
-def _check_statsmodels() -> None:
-    if AutoReg is None or ARIMA is None:
-        raise ImportError("statsmodels is required for time-series models")
+def fit_ar(series: Any, lags: int, **kwargs: Any):
+    """Fit an autoregressive model of order ``lags``."""
+    ar_model = require("statsmodels.tsa.ar_model", purpose="AR models")
+    return ar_model.AutoReg(series, lags=lags, old_names=False, **kwargs).fit()
 
 
-def _check_arch() -> None:
-    if arch_model is None:
-        raise ImportError("arch is required for GARCH models")
+def fit_ma(series: Any, q: int, **kwargs: Any):
+    """Fit a moving-average model of order ``q``."""
+    return fit_arima(series, p=0, d=0, q=q, **kwargs)
 
 
-def fit_ar(series: pd.Series, lags: int):
-    """Fit an autoregressive (AR) model."""
+def fit_arima(series: Any, *, p: int, d: int, q: int, **kwargs: Any):
+    """Fit an ARIMA(p, d, q) model.
 
-    _check_statsmodels()
-    model = AutoReg(series, lags=lags, old_names=False)
-    return model.fit()
-
-
-def fit_ma(series: pd.Series, q: int):
-    """Fit a moving-average (MA) model."""
-
-    _check_statsmodels()
-    model = ARIMA(series, order=(0, 0, q))
-    return model.fit()
-
-
-def fit_arma(series: pd.Series, p: int, q: int):
-    """Fit an ARMA model."""
-
-    _check_statsmodels()
-    model = ARIMA(series, order=(p, 0, q))
-    return model.fit()
-
-
-def fit_arima(series: pd.Series, p: int, d: int, q: int):
-    """Fit an ARIMA model."""
-
-    _check_statsmodels()
-    model = ARIMA(series, order=(p, d, q))
-    return model.fit()
-
-
-def fit_garch(series: pd.Series, p: int = 1, q: int = 1):
-    """Fit a GARCH model using the `arch` package."""
-
-    _check_arch()
-    model = arch_model(series, vol="GARCH", p=p, q=q)
-    return model.fit(disp="off")
-
-def residual_diagnostics(residuals: pd.Series, lags: int = 20):
-    """Run common statistical tests on model residuals.
-
-    Parameters
-    ----------
-    residuals:
-        The residual series from a fitted model.
-    lags:
-        Number of lags for the Ljung-Box test.
+    Examples
+    --------
+    >>> import numpy as np, pandas as pd
+    >>> rng = np.random.default_rng(0)
+    >>> s = pd.Series(rng.normal(size=200).cumsum())
+    >>> res = fit_arima(s, p=1, d=1, q=0)
+    >>> hasattr(res, "aic")
+    True
     """
+    arima = require("statsmodels.tsa.arima.model", purpose="ARIMA models")
+    return arima.ARIMA(series, order=(p, d, q), **kwargs).fit()
 
-    res = residuals.dropna().to_numpy()
-    return {
-        "adf": adf_test(res),
-        "kpss": kpss_test(res),
-        "jarque_bera": jarque_bera_test(res),
-        "ljung_box": ljung_box(res, lags=lags),
-        "ks": ks_test(res),
-    }
 
+def fit_garch(
+    series: Any, *, p: int = 1, q: int = 1, mean: str = "Constant", **kwargs: Any
+):
+    """Fit a GARCH(p, q) model using the ``arch`` package.
+
+    Note that ``arch`` expects returns scaled to percentage points; feeding it
+    raw decimal returns produces a poorly-scaled optimisation and a loud warning.
+    """
+    arch = require("arch", purpose="GARCH models")
+    model = arch.arch_model(series, vol="GARCH", p=p, q=q, mean=mean, **kwargs)
+    return model.fit(disp="off")

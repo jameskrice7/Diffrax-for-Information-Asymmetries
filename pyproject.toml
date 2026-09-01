@@ -1,34 +1,180 @@
-[project]
-name = "finax"
-version = "0.1.0"
-description = "Financial modeling on JAX and Diffrax"
-readme = "README.md"
-requires-python = ">=3.8"
-dependencies = [
-    "jax",
-    "diffrax",
-    "pandas",
-    "numpy",
-    "optax",
-    "requests",
-]
-
 [build-system]
-requires = ["setuptools>=61.0"]
+# setuptools >= 77 is required for the PEP 639 `license` expression and
+# `license-files` fields used below.
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
-[project.optional-dependencies]
-tensorflow = ["tensorflow"]
-torch = ["torch"]
-eikon = ["eikon"]
-flax = ["flax"]
-haiku = ["dm-haiku"]
-visualization = ["matplotlib", "seaborn"]
-excel = ["openpyxl"]
-hdf5 = ["tables"]
-huggingface = ["datasets", "transformers"]
-timeseries = ["statsmodels", "arch", "scipy"]
-yahoo = ["requests"]
-quandl = ["requests"]
-streaming = ["websocket-client", "kafka-python"]
+[project]
+name = "finax"
+version = "0.2.0"
+description = "Neural differential equations and differentiable market microstructure on JAX and Diffrax"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "James Rice" }]
+maintainers = [{ name = "James Rice" }]
+keywords = [
+    "jax",
+    "diffrax",
+    "equinox",
+    "neural-differential-equations",
+    "neural-sde",
+    "neural-cde",
+    "latent-sde",
+    "stochastic-differential-equations",
+    "market-microstructure",
+    "information-asymmetry",
+    "probability-of-informed-trading",
+    "quantitative-finance",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Financial and Insurance Industry",
+    # No "License ::" classifier: PEP 639 supersedes it with the SPDX
+    # `license` expression above, and setuptools rejects having both.
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Typing :: Typed",
+]
 
+# The core is deliberately small: JAX, the differential-equation stack, and
+# NumPy. Everything else is an extra, so a user who only wants the
+# microstructure estimators does not pull in pandas, matplotlib and statsmodels.
+dependencies = [
+    "jax>=0.4.34",
+    "jaxlib>=0.4.34",
+    "diffrax>=0.6.0",
+    "equinox>=0.11.4",
+    "lineax>=0.0.5",
+    "optax>=0.2.2",
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+data = ["pandas>=2.0", "pyarrow>=14.0", "openpyxl>=3.1", "tables>=3.9"]
+stats = ["scipy>=1.11", "statsmodels>=0.14", "arch>=6.2"]
+viz = ["matplotlib>=3.7"]
+hf = ["datasets>=2.16", "transformers>=4.38"]
+streaming = ["websocket-client>=1.7", "kafka-python>=2.0"]
+torch = ["torch>=2.1"]
+tensorflow = ["tensorflow>=2.15"]
+
+# Everything a researcher normally wants.
+all = [
+    "finax[data,stats,viz]",
+]
+
+dev = [
+    "finax[data,stats,viz]",
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-xdist>=3.5",
+    "ruff>=0.6",
+    "mypy>=1.11",
+]
+
+docs = [
+    "finax[all]",
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.26",
+]
+
+[project.urls]
+Homepage = "https://github.com/jameskrice7/Diffrax-for-Information-Asymmetries"
+Repository = "https://github.com/jameskrice7/Diffrax-for-Information-Asymmetries"
+Issues = "https://github.com/jameskrice7/Diffrax-for-Information-Asymmetries/issues"
+Changelog = "https://github.com/jameskrice7/Diffrax-for-Information-Asymmetries/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+include = ["finax*"]
+exclude = ["tests*", "docs*"]
+
+[tool.setuptools.package-data]
+finax = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "-ra",
+]
+doctest_optionflags = ["ELLIPSIS", "NORMALIZE_WHITESPACE"]
+filterwarnings = [
+    "error::DeprecationWarning:finax.*",
+]
+markers = [
+    "slow: tests that take more than a few seconds",
+]
+
+[tool.coverage.run]
+source = ["finax"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@overload",
+]
+
+[tool.ruff]
+line-length = 90
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "C4",   # comprehensions
+    "SIM",  # simplify
+    "RUF",  # ruff-specific
+]
+ignore = [
+    "E741",   # ambiguous variable names: `l`, `I` are standard in this maths
+    "B008",   # function call in default arg: fine for jnp constants
+    "RUF002", # ambiguous unicode in docstrings: we use proper minus/dashes
+    "RUF003",
+    # jaxtyping shape annotations such as Float[Array, "time channel"] are
+    # string subscripts, which pyflakes tries to parse as forward references
+    # and reports as syntax errors. They are not.
+    "F722",
+    # __all__ is grouped by topic with comments, which reads better than
+    # alphabetical order for modules with many exports.
+    "RUF022",
+    # UP037 strips quotes it believes are redundant, but it cannot tell a
+    # forward reference from a jaxtyping shape spec: it rewrites
+    # `Float[Array, "..."]` (any shape) into `Float[Array, ...]` (an Ellipsis),
+    # silently changing the annotation's meaning.
+    "UP037",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]
+"finax/_typing.py" = ["F401", "UP007"]
+# The TYPE_CHECKING block re-imports submodules purely so that static analysers
+# and IDEs can resolve `finax.models` etc., which are otherwise only reachable
+# through the lazy module __getattr__.
+"finax/__init__.py" = ["F401"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_configs = true
+ignore_missing_imports = true
+# JAX/Equinox make heavy use of dynamic typing; be pragmatic rather than strict.
+disallow_untyped_defs = false
+check_untyped_defs = true

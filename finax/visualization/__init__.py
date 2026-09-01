@@ -1,21 +1,19 @@
-"""Visualization helpers for Finax."""
+"""Plotting helpers. Requires the ``viz`` extra."""
 
 from .plots import (
     figure_to_base64,
-    plot_distribution,
+    plot_convergence,
+    plot_fan_chart,
+    plot_paths,
     plot_solution,
-    plot_time_series,
     plot_training_history,
-    summarize_statistics,
-    web_series_payload,
 )
 
 __all__ = [
-    "plot_time_series",
-    "plot_distribution",
+    "plot_paths",
+    "plot_fan_chart",
     "plot_training_history",
+    "plot_convergence",
     "plot_solution",
-    "summarize_statistics",
-    "web_series_payload",
     "figure_to_base64",
 ]
