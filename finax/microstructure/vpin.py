@@ -80,6 +80,8 @@ def volume_bars(
         raise ShapeError(
             f"prices {prices.shape} and volumes {volumes.shape} must have the same shape."
         )
+    if prices.shape[0] == 0:
+        raise DataValidationError("Need at least one trade to build volume bars.")
     if bucket_volume <= 0:
         raise DataValidationError(f"bucket_volume must be positive, got {bucket_volume}.")
 
@@ -90,7 +92,9 @@ def volume_bars(
     idx = jnp.floor((cumulative - volumes) / bucket_volume).astype(jnp.int32)
     idx = jnp.clip(idx, 0, n_buckets - 1)
 
-    bar_volumes = jnp.zeros((n_buckets,), prices.dtype).at[idx].add(volumes)
+    bar_volumes = jnp.zeros((n_buckets,), jnp.result_type(prices, volumes)).at[idx].add(
+        volumes
+    )
     # Last price in each bucket: a max-scatter over trade position picks the
     # latest trade, then we gather its price.
     last_pos = (

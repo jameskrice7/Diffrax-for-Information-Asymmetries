@@ -31,7 +31,10 @@ def load_config(path: str | Path) -> dict[str, Any]:
     if suffix == ".json":
         return json.loads(path.read_text(encoding="utf-8"))
     if suffix == ".toml":
-        import tomllib
+        try:
+            import tomllib
+        except ModuleNotFoundError:
+            tomllib = require("tomli", purpose="reading TOML config on Python < 3.11")
 
         return tomllib.loads(path.read_text(encoding="utf-8"))
     if suffix in (".yaml", ".yml"):

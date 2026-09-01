@@ -177,6 +177,23 @@ class TestVPIN:
         assert bar_prices.shape == (10,)
         assert abs(float(jnp.sum(bar_volumes)) - 1000.0) < 1e-3
 
+    def test_volume_bars_rejects_empty_trades(self):
+        from finax.errors import DataValidationError
+
+        with pytest.raises(DataValidationError, match="at least one trade"):
+            volume_bars(
+                jnp.array([], dtype=jnp.float32),
+                jnp.array([], dtype=jnp.float32),
+                bucket_volume=100.0,
+                n_buckets=2,
+            )
+
+    def test_volume_bars_preserve_volume_precision(self):
+        prices = jnp.array([1.0, 2.0, 3.0], dtype=jnp.float16)
+        volumes = jnp.array([10.0, 20.0, 30.0], dtype=jnp.float32)
+        _, bar_volumes = volume_bars(prices, volumes, bucket_volume=30.0, n_buckets=2)
+        assert bar_volumes.dtype == jnp.result_type(prices, volumes)
+
     def test_bvc_splits_volume_exactly(self):
         prices = jnp.array([100.0, 101.0, 99.0, 103.0, 102.0])
         volumes = jnp.array([100.0, 200.0, 150.0, 300.0, 50.0])
